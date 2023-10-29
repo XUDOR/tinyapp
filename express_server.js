@@ -10,15 +10,27 @@ const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
+//  Random Url generation function
+const generateRandomString = function() {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  
+  for (let i = 0; i < 6; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    result += characters.charAt(randomIndex);
+  }
+
+  return result;
+};
+console.log(generateRandomString());
+
 
 // Root route
+
+app.use(express.urlencoded({ extended: true })); /// this goes here ??
+
 app.get("/", (req, res) => {
   res.send("Hello!");
-});
-
-// Start server
-app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
 });
 
 // Send database as JSON
@@ -30,6 +42,11 @@ app.get("/urls.json", (req, res) => {
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase };
   res.render("urls_index", templateVars);
+});
+
+// Add the new route definition for '/urls/new' here
+app.get("/urls/new", (req, res) => {
+  res.render("urls_new");
 });
 
 // Render information about a single URL
@@ -50,3 +67,13 @@ app.get("/hello", (req, res) => {
   res.render("hello_world", templateVars);
 });
 
+
+app.post("/urls", (req, res) => {
+  console.log(req.body); // Log the POST request body to the console
+  res.send("Ok"); // Respond with 'Ok' (we will replace this)
+});
+
+// Start server
+app.listen(PORT, () => {
+  console.log(`Example app listening on port ${PORT}!`);
+});
