@@ -67,11 +67,24 @@ app.get("/hello", (req, res) => {
   res.render("hello_world", templateVars);
 });
 
+app.get("/u/:id", (req, res) => {
+  const shortURL = req.params.id;                    // Extract the short URL ID from the request
+  const longURL = urlDatabase[shortURL];             // Look up the long URL using the short URL ID
+  if (!longURL) {                                    // If the short URL ID doesn't exist in the database
+    return res.status(404).send("URL not found");    // Send a 404 not found response
+  }
+  res.redirect(longURL);                             // Redirect to the long URL
+});
+
+
 
 app.post("/urls", (req, res) => {
-  console.log(req.body); // Log the POST request body to the console
-  res.send("Ok"); // Respond with 'Ok' (we will replace this)
+  const longURL = req.body.longURL;
+  const shortURL = generateRandomString();
+  urlDatabase[shortURL] = longURL;
+  res.redirect(`/urls/${shortURL}`);
 });
+
 
 // Start server
 app.listen(PORT, () => {
