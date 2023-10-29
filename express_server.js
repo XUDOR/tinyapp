@@ -85,6 +85,19 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${shortURL}`);
 });
 
+app.post("/urls/:id/delete", (req, res) => {
+  const shortURL = req.params.id;
+  
+  // Check if the URL exists in the database
+  if (urlDatabase[shortURL]) {
+    delete urlDatabase[shortURL]; // Remove the URL from the database
+    res.redirect("/urls"); // Redirect to the URLs index page
+  } else {
+    res.status(404).send("Short URL not found"); // If the URL doesn't exist, send an error
+  }
+});
+
+
 
 // Start server
 app.listen(PORT, () => {
