@@ -13,10 +13,25 @@
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-      <div class="navbar-nav">
+      <div class="navbar-nav mr-auto">
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
+      
+      <% if (typeof cookies.username !== 'undefined') { %>
+        <span class="navbar-text mr-3">Logged in as: <%= cookies.username %></span>
+        <!-- Logout button -->
+        <form class="form-inline" action="/logout" method="POST">
+            <button class="btn btn-outline-light" type="submit">Logout</button>
+        </form>
+      <% } else { %>
+        <!-- Login form -->
+        <form class="form-inline" action="/login" method="POST">
+            <input class="form-control mr-2" type="text" name="username" placeholder="Username" required>
+            <button class="btn btn-outline-light" type="submit">Login</button>
+        </form>
+      <% } %>
+      
     </div>
   </nav>
 </header>

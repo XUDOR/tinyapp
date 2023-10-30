@@ -1,9 +1,16 @@
 const express = require("express");
+const cookieParser = require('cookie-parser');
+
 const app = express();
 const PORT = 8080; // default port 8080
 
 // Set EJS as the view engine
 app.set("view engine", "ejs");
+
+// Use cookie-parser middleware
+app.use(cookieParser());
+
+app.use(express.urlencoded({ extended: true }));
 
 // Sample database
 const urlDatabase = {
@@ -26,9 +33,6 @@ console.log(generateRandomString());
 
 
 // Root route
-
-app.use(express.urlencoded({ extended: true })); /// this goes here ??
-
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
@@ -40,7 +44,10 @@ app.get("/urls.json", (req, res) => {
 
 // Render the urls_index template
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase };
+  const templateVars = {
+    urls: urlDatabase,
+    cookies: req.cookies
+  };
   res.render("urls_index", templateVars);
 });
 
@@ -97,6 +104,11 @@ app.post("/urls/:id/delete", (req, res) => {
   }
 });
 
+app.post("/login", (req, res) => {
+  const username = req.body.username;  // Extract the username from the request body
+  res.cookie('username', username);    // Set a cookie named 'username'
+  res.redirect('/urls');               // Redirect to '/urls' after setting the cookie
+});
 
 
 // Start server
