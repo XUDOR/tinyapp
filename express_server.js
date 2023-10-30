@@ -46,7 +46,7 @@ app.get("/urls.json", (req, res) => {
 app.get("/urls", (req, res) => {
   const templateVars = {
     urls: urlDatabase,
-    cookies: req.cookies
+    username: req.cookies["username"]
   };
   res.render("urls_index", templateVars);
 });

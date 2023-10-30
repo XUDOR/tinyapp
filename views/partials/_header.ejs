@@ -18,8 +18,8 @@
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
       
-      <% if (typeof cookies.username !== 'undefined') { %>
-        <span class="navbar-text mr-3">Logged in as: <%= cookies.username %></span>
+      <% if (typeof username !== 'undefined') { %>
+        <span class="navbar-text mr-3">Logged in as: <%= username %></span>
         <!-- Logout button -->
         <form class="form-inline" action="/logout" method="POST">
             <button class="btn btn-outline-light" type="submit">Logout</button>
