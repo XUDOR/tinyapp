@@ -83,7 +83,10 @@ app.get("/u/:id", (req, res) => {
   res.redirect(longURL);                             // Redirect to the long URL
 });
 
-
+// GET route for /register
+app.get("/register", (req, res) => {
+  res.render("register");
+});
 
 app.post("/urls", (req, res) => {
   const longURL = req.body.longURL;
