@@ -93,22 +93,24 @@ app.get("/register", (req, res) => {
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-  
-  let userID;
-  for (let id in users) {
-    if (users[id].email === email && users[id].password === password) {
-      userID = id;
-      break;
-    }
+  const user = getUserByEmail(email, users);
+
+  if (!user) {
+    return res.status(403).send("User cannot be found.");
   }
 
-  if (userID) {
-    res.cookie('user_id', userID);
-    res.redirect('/urls');
-  } else {
-    res.status(403).send("Invalid email or password");
+  if (user.password !== password) {
+    return res.status(403).send("Password does not match our records.");
   }
+
+  res.cookie('user_id', user.id);
+  res.redirect('/urls');
 });
+app.post("/logout", (req, res) => {
+  res.clearCookie('user_id');
+  res.redirect('/login');
+});
+
 
 app.post("/register", (req, res) => {
   const email = req.body.email;
@@ -153,11 +155,6 @@ app.post("/urls/:id/delete", (req, res) => {
   } else {
     res.status(404).send("Short URL not found");
   }
-});
-
-app.post("/logout", (req, res) => {
-  res.clearCookie('user_id');
-  res.redirect('/urls');
 });
 
 app.listen(PORT, () => {
