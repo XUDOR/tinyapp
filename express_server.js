@@ -10,6 +10,15 @@ app.set("view engine", "ejs");
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
+const getUserByEmail = function(email, users) {
+  for (let userID in users) {
+    if (users[userID].email === email) {
+      return users[userID];
+    }
+  }
+  return null;
+};
+
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
@@ -100,26 +109,29 @@ app.post("/register", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
 
+  // Check if email or password are empty strings
   if (!email || !password) {
     return res.status(400).send("Email and password are required.");
   }
 
-  for (let id in users) {
-    if (users[id].email === email) {
-      return res.status(400).send("Email already in use.");
-    }
+  // Use the helper function to check if the email is already in use
+  const user = getUserByEmail(email, users);
+  if (user) {
+    return res.status(400).send("Email already in use.");
   }
 
+  // If the checks pass, proceed to create a new user
   const userID = generateRandomString();
   users[userID] = {
     id: userID,
     email: email,
-    password: password
+    password: password // In a real application, this password should be hashed
   };
 
   res.cookie('user_id', userID);
   res.redirect('/urls');
 });
+
 
 app.post("/urls", (req, res) => {
   const longURL = req.body.longURL;
