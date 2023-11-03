@@ -25,12 +25,8 @@
             <button class="btn btn-outline-light" type="submit">Logout</button>
         </form>
       <% } else { %>
-        <!-- Login form -->
-        <form class="form-inline" action="/login" method="POST">
-            <input class="form-control mr-2" type="text" name="email" placeholder="Email" required>
-            <input class="form-control mr-2" type="password" name="password" placeholder="Password" required>
-            <button class="btn btn-outline-light" type="submit">Login</button>
-        </form>
+        <a class="nav-item nav-link" href="/login">Login</a>
+        <a class="nav-item nav-link" href="/register">Register</a>
       <% } %>
       
     </div>
