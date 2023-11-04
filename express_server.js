@@ -1,60 +1,44 @@
+const { getUserByEmail } = require('./helpers');
 
-const getUserByEmail = require('./helpers'); 
-
-const express = require("express"); // line 1
+const express = require("express");
 const bcrypt = require('bcryptjs');
 const cookieSession = require('cookie-session');
 
-
 const app = express();
-const PORT = 8080;
+const PORT = 8080; // Default port 8080
 
+// Users database example
 const users = {};
 
-app.set("view engine", "ejs");
-
-
-app.use(cookieSession({
-  name: 'session',
-  keys: ['key1', 'key2'], // Replace these with your own secret keys
-  // Cookie options
-  maxAge: 24 * 60 * 60 * 1000 // 24 hours
-}));
-
-app.use(express.urlencoded({ extended: true }));
-
-
-
+// URL database example
 const urlDatabase = {
   "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "userRandomID" },
   "9sm5xK": { longURL: "http://www.google.com", userID: "userRandomID" }
 };
 
+app.set("view engine", "ejs");
 
-const generateRandomString = function() {
+app.use(cookieSession({
+  name: 'session',
+  keys: ['key1', 'key2'], // Replace these with your own secret keys
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}));
+
+app.use(express.urlencoded({ extended: true }));
+
+// Function to generate random string for short URL
+const generateRandomString = () => {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let result = '';
   for (let i = 0; i < 6; i++) {
-    const randomIndex = Math.floor(Math.random() * characters.length);
-    result += characters.charAt(randomIndex);
+    result += characters.charAt(Math.floor(Math.random() * characters.length));
   }
   return result;
 };
 
-app.get("/", (req, res) => {
-  if (req.session.user_id) {
-    res.redirect("/urls");
-  } else {
-    res.redirect("/login");
-  }
-});
-
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
-});
-
+// Function to filter URLs for a specific user
 const urlsForUser = (id) => {
-  let filteredUrls = {};
+  const filteredUrls = {};
   for (let shortURL in urlDatabase) {
     if (urlDatabase[shortURL].userID === id) {
       filteredUrls[shortURL] = urlDatabase[shortURL];
@@ -63,6 +47,43 @@ const urlsForUser = (id) => {
   return filteredUrls;
 };
 
+// Root route redirects based on authentication
+app.get("/", (req, res) => {
+  if (req.session.user_id) {
+    res.redirect("/urls");
+  } else {
+    res.redirect("/login");
+  }
+});
+
+// Route to display JSON of all URLs (for debugging)
+app.get("/urls.json", (req, res) => {
+  res.json(urlDatabase);
+});
+
+// Route to show all URLs for a logged-in user
+app.get("/urls", (req, res) => {
+  const userID = req.session.user_id;
+  if (!userID) {
+    res.redirect("/login");
+  } else {
+    const userUrls = urlsForUser(userID);
+    const templateVars = { urls: userUrls, user: users[userID] };
+    res.render("urls_index", templateVars);
+  }
+});
+
+// Route to display form to create a new URL, redirect to login if not authenticated
+app.get("/urls/new", (req, res) => {
+  const userID = req.session.user_id;
+  if (!userID) {
+    res.redirect("/login");
+  } else {
+    res.render("urls_new", { user: users[userID] });
+  }
+});
+
+// Route to show a single URL and its short form, provided the user owns the URL
 app.get("/urls/:id", (req, res) => {
   const userID = req.session.user_id;
   const shortURL = req.params.id;
@@ -77,39 +98,31 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-
-// Redirect to login if not logged in when accessing /urls/new
-app.get("/urls/new", (req, res) => {
-  const userID = req.session.user_id;
-  if (!userID) {
-    return res.redirect("/login");
-  }
-  res.render("urls_new");
-});
-
-// Other GET routes...
-
-// Redirect to /urls if logged in when accessing /login
+// Login route
+// Login route
 app.get("/login", (req, res) => {
   const userID = req.session.user_id;
   if (userID) {
-    return res.redirect("/urls");
+    res.redirect("/urls");
+  } else {
+    res.render("login");
   }
-  res.render("login");
 });
 
-// Redirect to /urls if logged in when accessing /register
+// Register route
 app.get("/register", (req, res) => {
   const userID = req.session.user_id;
   if (userID) {
-    return res.redirect("/urls");
+    res.redirect("/urls");
+  } else {
+    res.render("register");
   }
-  res.render("register");
 });
 
-// Other POST routes...
 
+// Login form submission
 app.post("/login", (req, res) => {
+  console.log("Login route hit. Email:", req.body.email);
   const email = req.body.email;
   const password = req.body.password;
   const user = getUserByEmail(email, users);
@@ -121,13 +134,15 @@ app.post("/login", (req, res) => {
   }
 });
 
-
+// Logout action
 app.post("/logout", (req, res) => {
   req.session = null;
   res.redirect('/login');
 });
 
-app.post("/register", (req, res) => { //// ?? here ?
+// Registration form submission
+app.post("/register", (req, res) => {
+  console.log("Register route hit. Email:", req.body.email);
   const email = req.body.email;
   const password = req.body.password;
 
@@ -153,12 +168,11 @@ app.post("/register", (req, res) => { //// ?? here ?
   res.redirect('/urls');
 });
 
-
-// Line 135-146: POST route to delete a URL
+// URL deletion
 app.post("/urls/:id/delete", (req, res) => {
   const userID = req.session.user_id;
   const shortURL = req.params.id;
-  
+
   if (!userID) {
     return res.status(401).send("You must be logged in to delete URLs.");
   }
@@ -167,7 +181,7 @@ app.post("/urls/:id/delete", (req, res) => {
   if (!url) {
     return res.status(404).send("URL not found.");
   }
-  
+
   if (url.userID !== userID) {
     return res.status(403).send("You do not have permission to delete this URL.");
   }
@@ -176,7 +190,7 @@ app.post("/urls/:id/delete", (req, res) => {
   res.redirect('/urls');
 });
 
-// Line 148-160: POST route to update a URL
+// URL update
 app.post("/urls/:id", (req, res) => {
   const userID = req.session.user_id;
   const shortURL = req.params.id;
@@ -199,10 +213,7 @@ app.post("/urls/:id", (req, res) => {
   res.redirect(`/urls/${shortURL}`);
 });
 
-
-
-// Other POST routes...
-
+// Start the server
 app.listen(PORT, () => {
-  console.log(`Tiny App listening on port ${PORT}!`);
+  console.log(`TinyApp listening on port ${PORT}!`);
 });
