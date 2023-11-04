@@ -1,5 +1,7 @@
-const express = require("express"); // line 1 
+const express = require("express"); // line 1
 const cookieParser = require('cookie-parser');
+const bcrypt = require('bcryptjs');
+
 
 const app = express();
 const PORT = 8080;
@@ -104,6 +106,20 @@ app.get("/register", (req, res) => {
 
 // Other POST routes...
 
+app.post("/login", (req, res) => {
+  const email = req.body.email;
+  const password = req.body.password;
+
+  const user = getUserByEmail(email, users);
+  if (user && bcrypt.compareSync(password, user.password)) {
+    res.cookie('user_id', user.id);
+    res.redirect('/urls');
+  } else {
+    res.status(403).send("Email or password is incorrect.");
+  }
+});
+
+
 app.post("/logout", (req, res) => {
   res.clearCookie('user_id');
   res.redirect('/login');
@@ -122,16 +138,19 @@ app.post("/register", (req, res) => {
     return res.status(400).send("Email already in use.");
   }
 
+  const hashedPassword = bcrypt.hashSync(password, 10);
   const userID = generateRandomString();
+
   users[userID] = {
     id: userID,
     email: email,
-    password: password // Note: password should be hashed
+    password: hashedPassword
   };
 
   res.cookie('user_id', userID);
   res.redirect('/urls');
 });
+
 
 // Line 135-146: POST route to delete a URL
 app.post("/urls/:id/delete", (req, res) => {
