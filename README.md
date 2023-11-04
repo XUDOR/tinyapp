@@ -1,7 +1,8 @@
 # tinyapp
 LIGHTHOUSE LABS - week 6-7 : Assignment
-<<purpose: takes a long url and creates a short one>>
 
+Purpose: takes a long url and creates a short one
+_______________________________________________________-
 by: Roderick Shoolbraid, student at Lighthouse Labs 
 Novemeber 4 2023
 
