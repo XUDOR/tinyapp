@@ -1,5 +1,5 @@
 # tinyapp
-LHL_WEEK6-assignment
+LIGHTHOUSE LABS - week 6-7 : Assignment
 <<purpose: takes a long url and creates a short one>>
 
 by: Roderick Shoolbraid, student at Lighthouse Labs 
@@ -13,7 +13,6 @@ Novemeber 4 2023
 - bcryptjs
 - cookie-session
 
-- 
 ## devDependencies
 
     chai ^4.3.10
