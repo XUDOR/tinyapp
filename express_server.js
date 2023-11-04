@@ -1,3 +1,6 @@
+
+const getUserByEmail = require('./helpers'); 
+
 const express = require("express"); // line 1
 const bcrypt = require('bcryptjs');
 const cookieSession = require('cookie-session');
@@ -20,14 +23,7 @@ app.use(cookieSession({
 
 app.use(express.urlencoded({ extended: true }));
 
-const getUserByEmail = function(email, users) {
-  for (let userID in users) {
-    if (users[userID].email === email) {
-      return users[userID];
-    }
-  }
-  return null;
-};
+
 
 const urlDatabase = {
   "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "userRandomID" },
