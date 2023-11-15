@@ -83,6 +83,21 @@ app.get("/urls/new", (req, res) => {
   }
 });
 
+
+// Route to handle new URL creation
+app.post("/urls", (req, res) => {
+  const userID = req.session.user_id;
+  if (!userID) {
+    return res.status(401).send("You must be logged in to create URLs.");
+  }
+
+  const longURL = req.body.longURL; // Get the long URL from the form submission
+  const shortURL = generateRandomString(); // Generate a random short URL ID
+  urlDatabase[shortURL] = { longURL: longURL, userID: userID }; // Add the new URL to the database
+
+  res.redirect(`/urls/${shortURL}`); // Redirect to the new URL's page
+});
+
 // Route to show a single URL and its short form, provided the user owns the URL
 app.get("/urls/:id", (req, res) => {
   const userID = req.session.user_id;
