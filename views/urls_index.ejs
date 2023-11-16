@@ -31,23 +31,23 @@
               </tr>
           </thead>
           <tbody>
-              <% for (let id in urls) { %>
-                  <tr>
-                      <td><%= id %></td>
-                      <td><%= urls[id] %></td>
-                      <!-- New table cell for the "Edit" link -->
-                      <td>
-                      <a href="/urls/<%= id %>">Edit</a>
-                      </td> 
-                      <!-- New table cell for the "Delete" button -->
-                      <td>
-                          <form method="POST" action="/urls/<%= id %>/delete">
-                              <button type="submit">Delete</button>
-                          </form>
-                      </td>
-                  </tr>
-              <% } %>
-          </tbody>
+            <% for (let id in urls) { %>
+                <tr>
+                    <td><%= id %></td>
+                    <td><%= urls[id].longURL %></td> <!-- Corrected line to display the long URL -->
+                    <!-- Other table cells for "Edit" link and "Delete" button -->
+                    <td>
+                        <a href="/urls/<%= id %>">Edit</a>
+                    </td> 
+                    <td>
+                        <form method="POST" action="/urls/<%= id %>/delete">
+                            <button type="submit">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            <% } %>
+        </tbody>
+        
       </table>
   </main>
   <!-- Bootstrap JS -->

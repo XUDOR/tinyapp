@@ -1,4 +1,4 @@
-const { getUserByEmail } = require('./helpers');
+const { getUserByEmail, generateRandomString, urlsForUser } = require('./helpers');
 
 const express = require("express");
 const bcrypt = require('bcryptjs');
@@ -26,27 +26,6 @@ app.use(cookieSession({
 
 app.use(express.urlencoded({ extended: true }));
 
-// Function to generate random string for short URL
-const generateRandomString = () => {
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let result = '';
-  for (let i = 0; i < 6; i++) {
-    result += characters.charAt(Math.floor(Math.random() * characters.length));
-  }
-  return result;
-};
-
-// Function to filter URLs for a specific user
-const urlsForUser = (id) => {
-  const filteredUrls = {};
-  for (let shortURL in urlDatabase) {
-    if (urlDatabase[shortURL].userID === id) {
-      filteredUrls[shortURL] = urlDatabase[shortURL];
-    }
-  }
-  return filteredUrls;
-};
-
 // Root route redirects based on authentication
 app.get("/", (req, res) => {
   if (req.session.user_id) {
@@ -67,7 +46,7 @@ app.get("/urls", (req, res) => {
   if (!userID) {
     res.redirect("/login");
   } else {
-    const userUrls = urlsForUser(userID);
+    const userUrls = urlsForUser(userID,urlDatabase);
     const templateVars = { urls: userUrls, user: users[userID] };
     res.render("urls_index", templateVars);
   }
