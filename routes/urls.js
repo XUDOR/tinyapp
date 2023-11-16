@@ -1,7 +1,13 @@
-const { urlsForUser, generateRandomString } = require('../helpers');
+
 
 module.exports = function(app, urlDatabase, users) {
 
+const { urlsForUser, generateRandomString } = require('../helpers');
+
+  // Route to display JSON of all URLs (for debugging)
+  app.get("/urls.json", (req, res) => {
+    res.json(urlDatabase);
+  });
 
   // Route to show all URLs for a logged-in user
   app.get("/urls", (req, res) => {
