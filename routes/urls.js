@@ -2,7 +2,7 @@
 
 module.exports = function(app, urlDatabase, users) {
 
-const { urlsForUser, generateRandomString } = require('../helpers');
+  const { urlsForUser, generateRandomString } = require('../helpers');
 
   // Route to display JSON of all URLs (for debugging)
   app.get("/urls.json", (req, res) => {
@@ -60,5 +60,50 @@ const { urlsForUser, generateRandomString } = require('../helpers');
     const templateVars = { id: shortURL, longURL: url.longURL, user: users[userID] };
     res.render("urls_show", templateVars);
   });
-};
 
+
+  // URL deletion
+  app.post("/urls/:id/delete", (req, res) => {
+    const userID = req.session.user_id;
+    const shortURL = req.params.id;
+
+    if (!userID) {
+      return res.status(401).send("You must be logged in to delete URLs.");
+    }
+
+    const url = urlDatabase[shortURL];
+    if (!url) {
+      return res.status(404).send("URL not found.");
+    }
+
+    if (url.userID !== userID) {
+      return res.status(403).send("You do not have permission to delete this URL.");
+    }
+
+    delete urlDatabase[shortURL];
+    res.redirect('/urls');
+  });
+
+  // URL update
+  app.post("/urls/:id", (req, res) => {
+    const userID = req.session.user_id;
+    const shortURL = req.params.id;
+    const newLongURL = req.body.longURL;
+
+    if (!userID) {
+      return res.status(401).send("You must be logged in to update URLs.");
+    }
+
+    const url = urlDatabase[shortURL];
+    if (!url) {
+      return res.status(404).send("URL not found.");
+    }
+
+    if (url.userID !== userID) {
+      return res.status(403).send("You do not have permission to update this URL.");
+    }
+
+    urlDatabase[shortURL].longURL = newLongURL;
+    res.redirect(`/urls/${shortURL}`);
+  });
+};
