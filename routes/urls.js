@@ -1,39 +1,33 @@
-
+const { requireLogin } = require('../middleware');
 
 module.exports = function(app, urlDatabase, users) {
 
   const { urlsForUser, generateRandomString } = require('../helpers');
 
   // Route to display JSON of all URLs (for debugging)
-  app.get("/urls.json", (req, res) => {
+  app.get("/urls.json", requireLogin, (req, res) => {
     res.json(urlDatabase);
   });
 
   // Route to show all URLs for a logged-in user
-  app.get("/urls", (req, res) => {
+  app.get("/urls", requireLogin, (req, res) => {
     const userID = req.session.user_id;
-    if (!userID) {
-      res.redirect("/login");
-    } else {
-      const userUrls = urlsForUser(userID,urlDatabase);
-      const templateVars = { urls: userUrls, user: users[userID] };
-      res.render("urls_index", templateVars);
-    }
+    const userUrls = urlsForUser(userID,urlDatabase);
+    const templateVars = { urls: userUrls, user: users[userID] };
+    res.render("urls_index", templateVars);
+    
   });
 
   // Route to display form to create a new URL, redirect to login if not authenticated
-  app.get("/urls/new", (req, res) => {
+  app.get("/urls/new", requireLogin, (req, res) => {
     const userID = req.session.user_id;
-    if (!userID) {
-      res.redirect("/login");
-    } else {
-      res.render("urls_new", { user: users[userID] });
-    }
+    res.render("urls_new", { user: users[userID] });
+    
   });
 
 
   // Route to handle new URL creation
-  app.post("/urls", (req, res) => {
+  app.post("/urls", requireLogin, (req, res) => {
     const userID = req.session.user_id;
     if (!userID) {
       return res.status(401).send("You must be logged in to create URLs.");
@@ -47,7 +41,7 @@ module.exports = function(app, urlDatabase, users) {
   });
 
   // Route to show a single URL and its short form, provided the user owns the URL
-  app.get("/urls/:id", (req, res) => {
+  app.get("/urls/:id", requireLogin, (req, res) => {
     const userID = req.session.user_id;
     const shortURL = req.params.id;
     const url = urlDatabase[shortURL];
@@ -63,7 +57,7 @@ module.exports = function(app, urlDatabase, users) {
 
 
   // URL deletion
-  app.post("/urls/:id/delete", (req, res) => {
+  app.post("/urls/:id/delete", requireLogin, (req, res) => {
     const userID = req.session.user_id;
     const shortURL = req.params.id;
 
@@ -85,7 +79,7 @@ module.exports = function(app, urlDatabase, users) {
   });
 
   // URL update
-  app.post("/urls/:id", (req, res) => {
+  app.post("/urls/:id", requireLogin, (req, res) => {
     const userID = req.session.user_id;
     const shortURL = req.params.id;
     const newLongURL = req.body.longURL;
@@ -107,3 +101,4 @@ module.exports = function(app, urlDatabase, users) {
     res.redirect(`/urls/${shortURL}`);
   });
 };
+

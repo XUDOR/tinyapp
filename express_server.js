@@ -1,6 +1,8 @@
 const express = require("express");
 const bcrypt = require('bcryptjs');
 const cookieSession = require('cookie-session');
+const { requireLogin } = require('./middleware');
+
 const app = express();
 const PORT = 8080; // Default port 8080
 
@@ -27,54 +29,8 @@ app.use(express.urlencoded({ extended: true }));
 const authRoutes = require('./routes/auth');
 authRoutes(app, users, bcrypt);
 
-// URL deletion
-app.post("/urls/:id/delete", (req, res) => {
-  const userID = req.session.user_id;
-  const shortURL = req.params.id;
-
-  if (!userID) {
-    return res.status(401).send("You must be logged in to delete URLs.");
-  }
-
-  const url = urlDatabase[shortURL];
-  if (!url) {
-    return res.status(404).send("URL not found.");
-  }
-
-  if (url.userID !== userID) {
-    return res.status(403).send("You do not have permission to delete this URL.");
-  }
-
-  delete urlDatabase[shortURL];
-  res.redirect('/urls');
-});
-
-// URL update
-app.post("/urls/:id", (req, res) => {
-  const userID = req.session.user_id;
-  const shortURL = req.params.id;
-  const newLongURL = req.body.longURL;
-
-  if (!userID) {
-    return res.status(401).send("You must be logged in to update URLs.");
-  }
-
-  const url = urlDatabase[shortURL];
-  if (!url) {
-    return res.status(404).send("URL not found.");
-  }
-
-  if (url.userID !== userID) {
-    return res.status(403).send("You do not have permission to update this URL.");
-  }
-
-  urlDatabase[shortURL].longURL = newLongURL;
-  res.redirect(`/urls/${shortURL}`);
-});
-
 const urlRoutes = require('./routes/urls');
 urlRoutes(app, urlDatabase, users);
-
 
 // Start the server
 app.listen(PORT, () => {
