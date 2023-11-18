@@ -25,7 +25,6 @@ module.exports = function(app, urlDatabase, users) {
     
   });
 
-
   // Route to handle new URL creation
   app.post("/urls", requireLogin, (req, res) => {
     const userID = req.session.user_id;
@@ -54,7 +53,6 @@ module.exports = function(app, urlDatabase, users) {
     const templateVars = { id: shortURL, longURL: url.longURL, user: users[userID] };
     res.render("urls_show", templateVars);
   });
-
 
   app.get("/u/:shortURL", (req, res) => {
     const shortURL = req.params.shortURL;

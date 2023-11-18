@@ -10,9 +10,7 @@ module.exports = function(app, users, bcrypt) {
       res.redirect("/login");
     }
   });
-
-
-
+  
   // Login route
   app.get("/login", (req, res) => {
     const userID = req.session.user_id;
