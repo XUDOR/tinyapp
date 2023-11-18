@@ -27,15 +27,14 @@
                   <th scope="col">Short URL ID</th>
                   <th scope="col">Long URL</th>
                   <th scope="col">Edit</th>
-                  <th scope="col">Actions</th> <!-- New column header for actions -->
+                  <th scope="col">Actions</th> 
               </tr>
           </thead>
           <tbody>
             <% for (let id in urls) { %>
                 <tr>
-                    <td><%= id %></td>
-                    <td><%= urls[id].longURL %></td> <!-- Corrected line to display the long URL -->
-                    <!-- Other table cells for "Edit" link and "Delete" button -->
+                    <td><a href="/u/<%= id %>" target="_blank"><%= id %></a></td> <!-- Short URL clickable -->
+                    <td><a href="<%= urls[id].longURL %>" target="_blank"><%= urls[id].longURL %></a></td> <!-- Long URL clickable -->
                     <td>
                         <a href="/urls/<%= id %>">Edit</a>
                     </td> 
@@ -47,6 +46,7 @@
                 </tr>
             <% } %>
         </tbody>
+        
         
       </table>
   </main>

@@ -56,6 +56,23 @@ module.exports = function(app, urlDatabase, users) {
   });
 
 
+  app.get("/u/:shortURL", (req, res) => {
+    const shortURL = req.params.shortURL;
+    const urlEntry = urlDatabase[shortURL];
+
+    if (urlEntry) {
+      res.redirect(urlEntry.longURL);
+    } else {
+      res.status(404).send("Short URL not found");
+    }
+  });
+
+
+
+
+
+  
+
   // URL deletion
   app.post("/urls/:id/delete", requireLogin, (req, res) => {
     const userID = req.session.user_id;
