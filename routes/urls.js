@@ -67,12 +67,6 @@ module.exports = function(app, urlDatabase, users) {
     }
   });
 
-
-
-
-
-  
-
   // URL deletion
   app.post("/urls/:id/delete", requireLogin, (req, res) => {
     const userID = req.session.user_id;
